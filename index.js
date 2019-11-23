@@ -32,6 +32,7 @@ server.get('/now', (req, res) => {
 })
 
 
+
 // GET /hubs
 server.get('/hubs', (req, res) => {
     db.find()
