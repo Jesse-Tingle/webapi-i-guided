@@ -9,6 +9,9 @@ const db = require('./data/hubs-model.js');
 // global objects
 const server = express();
 
+// middleware
+server.use(express.json())
+
 
 // what happens on a GET request to /
 // request handler
@@ -47,9 +50,10 @@ server.get('/hubs', (req, res) => {
         })
 })
 
-// POST /
-server.post('/', (req, res) => {
+// POST /hubs
+server.post('/hubs', (req, res) => {
     const newHub = req.body;
+    console.log('new hub', newHub)
     // could add a step here to validate the hub
     db.add(newHub)
         .then(hub => {
@@ -63,6 +67,75 @@ server.post('/', (req, res) => {
         })
 })
 
+// DELETE  /hubs/:id
+server.delete('/hubs/:id', (req, res) => {
+    const { id } = req.params; // or can also be written   const id = req.params.id;
+
+    db.remove(id)
+        .then(deletedHub => {
+            if(deletedHub) {
+                res.json(deletedHub)
+            } else {
+                res.status(404).json({
+                    message: 'invalid hub id'
+                })
+            }
+            
+        })
+        .catch(err => {
+            res.status(500).json({
+                err: err,
+                message: 'failed to delete hub'
+            })
+        })
+})
+
+
+
+// PUT /hubs/:id
+server.put('/hubs/:id', (req, res) => {
+    const { id } = req.params;
+    const changes = req.body;
+
+    db.update(id, changes)
+        .then(updated => {
+            if (updated) {
+                res.json(updated)
+            } else {
+                res.status(404).json({
+                    message: 'invalid hub id'
+                })
+            }
+        })
+        .catch(err => {
+            res.status(500).json({
+                err: err,
+                message: 'failed to update hub'
+            })
+        })
+})
+
+
+server.get('/hubs/:id', (req, res) => {
+    const { id } = req.params;
+    
+    db.findById(id)
+        .then(byId => {
+            if (byId) {
+                res.json(byId)
+            } else {
+                res.status(404).json({
+                    message: 'invalid hub id'
+                })
+            }
+        })
+        .catch(err => {
+            res.status(500).json({
+                err: err,
+                message: 'failed to get hub'
+            })
+        })
+})
 
 // should be last step
 server.listen(4000, () => {
