@@ -47,6 +47,22 @@ server.get('/hubs', (req, res) => {
         })
 })
 
+// POST /
+server.post('/', (req, res) => {
+    const newHub = req.body;
+    // could add a step here to validate the hub
+    db.add(newHub)
+        .then(hub => {
+            res.status(201).json(hub)
+        })
+        .catch(err => {
+            res.status(500).json({
+                err: err,
+                message: 'failed to create new hub'
+            })
+        })
+})
+
 
 // should be last step
 server.listen(4000, () => {
